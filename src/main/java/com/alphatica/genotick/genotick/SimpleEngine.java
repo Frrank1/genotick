@@ -5,7 +5,9 @@ import com.alphatica.genotick.data.DataSetName;
 import com.alphatica.genotick.data.MainAppData;
 import com.alphatica.genotick.killer.RobotKiller;
 import com.alphatica.genotick.population.Population;
+import com.alphatica.genotick.population.Robot;
 import com.alphatica.genotick.population.RobotInfo;
+import com.alphatica.genotick.population.RobotName;
 import com.alphatica.genotick.timepoint.TimePoint;
 import com.alphatica.genotick.timepoint.TimePointExecutor;
 import com.alphatica.genotick.timepoint.TimePointResult;
@@ -15,7 +17,13 @@ import com.alphatica.genotick.ui.UserOutput;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.Objects.isNull;
+import static java.util.Objects.nonNull;
 
 
 public class SimpleEngine implements Engine {
@@ -114,9 +122,31 @@ public class SimpleEngine implements Engine {
         }
         if (engineSettings.performTraining) {
             updatePopulation();
+            updateRobotsWeights(timePointResult.getRobotResults());
         }
         return timePointStats;
     }
+
+    private void updateRobotsWeights(List<RobotResult> results) {
+        Arrays.stream(population.listRobotsNames()).forEach(name -> recordRobotOutcomes(name, results));
+    }
+
+    private void recordRobotOutcomes(RobotName robotName, List<RobotResult> results) {
+        Robot robot = population.getRobot(robotName);
+        if(isNull(robot)) {
+            return;
+        }
+        Iterator<RobotResult> iterator = results.iterator();
+        while(iterator.hasNext()) {
+            RobotResult result = iterator.next();
+            if(result.getRobotName().equals(robotName)) {
+                robot.recordOutcome(result.getOutcome());
+                iterator.remove();
+            }
+        }
+        population.saveRobot(robot);
+    }
+
 
     private void tryUpdate(DataSetResult dataSetResult, TimePoint timePoint, Prediction prediction, TimePointStats timePointStats) {
         Double actualChange = data.getActualChange(dataSetResult.getName(), timePoint);

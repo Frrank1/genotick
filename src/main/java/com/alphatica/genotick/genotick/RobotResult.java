@@ -6,21 +6,22 @@ import com.alphatica.genotick.population.RobotName;
 public class RobotResult {
 
     private final Prediction prediction;
-    private final RobotName name;
+    private final Outcome outcome;
+    private final RobotName robotName;
     private final RobotData data;
     private final Double weight;
 
-    public RobotResult(Prediction prediction, Robot robot, RobotData data) {
-
+    public RobotResult(Prediction prediction, Outcome outcome, Robot robot, RobotData data) {
         this.prediction = prediction;
-        this.name = robot.getName();
+        this.outcome = outcome;
+        this.robotName = robot.getName();
         this.weight = robot.getWeight();
         this.data = data;
     }
 
     @Override
     public String toString() {
-        return "Name: " + name.toString() + " Prediction: " + prediction.toString() + " Weight: " + String.valueOf(weight);
+        return "Name: " + robotName.toString() + " Prediction: " + prediction.toString() + " Weight: " + String.valueOf(weight);
     }
 
     public Prediction getPrediction() {
@@ -33,5 +34,11 @@ public class RobotResult {
 
     public RobotData getData() {
         return data;
+    }
+
+    public Outcome getOutcome() { return outcome;}
+
+    public RobotName getRobotName() {
+        return robotName;
     }
 }

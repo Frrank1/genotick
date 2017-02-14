@@ -102,21 +102,17 @@ class SimpleTimePointExecutor implements TimePointExecutor {
             Robot robot = population.getRobot(robotName);
             List<RobotResult> list = dataSetExecutor.execute(robotDataList, robot, robotExecutor);
             if(updateRobots) {
-                updateRobots(robot,list);
+                updateRobot(robot,list);
             }
             RobotInfo robotInfo = new RobotInfo(robot);
             robotInfos.add(robotInfo);
             return list;
         }
 
-        private void updateRobots(Robot robot, List<RobotResult> list) {
-            List<Outcome> outcomes = new ArrayList<>();
+        private void updateRobot(Robot robot, List<RobotResult> list) {
             for(RobotResult result: list) {
                 robot.recordPrediction(result.getPrediction());
-                Outcome outcome = Outcome.getOutcome(result.getPrediction(),result.getData().getActualChange());
-                outcomes.add(outcome);
             }
-            robot.recordOutcomes(outcomes);
             population.saveRobot(robot);
         }
     }

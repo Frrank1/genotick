@@ -24,11 +24,15 @@ public class Robot implements Serializable {
     private InstructionList mainFunction;
     private int totalChildren;
     private int totalPredictions;
-    private int correctPredictions;
-    private double inheritedWeight;
-    private int totalOutcomes;
     private long outcomesAtLastChild;
     private int bias;
+    private double inheritedWeight;
+
+    private int totalOutcomes;
+    private int correctOutcomes;
+    private int incorrectOutcomes;
+
+
 
     public static Robot createEmptyRobot(int maximumDataOffset, int ignoreColumns) {
         return new Robot(maximumDataOffset, ignoreColumns);
@@ -57,21 +61,25 @@ public class Robot implements Serializable {
     }
 
     public void recordPrediction(Prediction prediction) {
+        if(prediction == Prediction.OUT) {
+            return;
+        }
         if(prediction == Prediction.DOWN)
             bias--;
         else if(prediction == Prediction.UP)
             bias++;
+        totalPredictions++;
     }
 
-    public void recordOutcomes(List<Outcome> outcomes) {
-        for(Outcome outcome: outcomes) {
-            totalOutcomes++;
-            if(outcome == Outcome.OUT) {
-                continue;
-            }
-            totalPredictions++;
-            if(outcome == Outcome.CORRECT)
-                correctPredictions++;
+    public void recordOutcome(Outcome outcome) {
+        totalOutcomes++;
+        if(outcome == Outcome.OUT) {
+            return;
+        }
+        if(outcome == Outcome.CORRECT) {
+            correctOutcomes++;
+        } else {
+            incorrectOutcomes++;
         }
     }
 
@@ -123,8 +131,8 @@ public class Robot implements Serializable {
     public int getTotalOutcomes() {
         return totalOutcomes;
     }
-    public int getCorrectPredictions() {
-        return correctPredictions;
+    public int getCorrectOutcomes() {
+        return correctOutcomes;
     }
 
     public int getBias() {
@@ -162,5 +170,9 @@ public class Robot implements Serializable {
                         append(field.get(this).toString()).append("\n");
             }
         }
+    }
+
+    public int getIncorrectOutcomes() {
+        return incorrectOutcomes;
     }
 }
